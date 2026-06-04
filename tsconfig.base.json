@@ -15,7 +15,8 @@
     "noUnusedParameters": false,
     "paths": {
       "@internal/*": ["./src/*"],
-      "redux": ["./src/index.ts"] // @remap-prod-remove-line
+      "redux": ["./src/index.ts"],
+      "redux/middleware": ["./src/middleware.ts"]
     },
     "resolveJsonModule": true,
     "skipLibCheck": true,

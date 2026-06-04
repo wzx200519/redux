@@ -1,0 +1,57 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..973c27e9 100644
+--- a/package.json
++++ b/package.json
+@@ -23,15 +23,20 @@
+     "Dan Abramov <dan.abramov@me.com> (https://github.com/gaearon)",
+     "Andrew Clark <acdlite@me.com> (https://github.com/acdlite)"
+   ],
+-  "main": "dist/cjs/redux.cjs",
+-  "module": "dist/redux.legacy-esm.js",
+-  "types": "dist/redux.d.mts",
++  "main": "./dist/index.cjs",
++  "module": "./dist/index.mjs",
++  "types": "./dist/index.d.mts",
+   "exports": {
+     "./package.json": "./package.json",
+     ".": {
+-      "types": "./dist/redux.d.mts",
+-      "import": "./dist/redux.mjs",
+-      "default": "./dist/cjs/redux.cjs"
++      "types": "./dist/index.d.mts",
++      "import": "./dist/index.mjs",
++      "require": "./dist/index.cjs"
++    },
++    "./middleware": {
++      "types": "./dist/middleware.d.mts",
++      "import": "./dist/middleware.mjs",
++      "require": "./dist/middleware.cjs"
+     }
+   },
+   "files": [
+@@ -47,7 +52,7 @@
+     "type-tests": "tsc -p tsconfig.test.json --noEmit",
+     "test:watch": "vitest --watch",
+     "test:cov": "vitest --coverage",
+-    "build": "yarn clean && tsup",
++    "build": "yarn clean && unbuild",
+     "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn test",
+     "prepack": "yarn build",
+     "examples:lint": "eslint --ext js,ts examples",
+@@ -74,8 +79,8 @@
+     "prettier": "^3.2.5",
+     "rimraf": "^5.0.5",
+     "rxjs": "^7.8.1",
+-    "tsup": "8.0.2",
+     "typescript": "^5.8.2",
++    "unbuild": "^3.5.0",
+     "vitest": "^4.0.5"
+   },
+   "resolutions": {
+@@ -84,4 +89,4 @@
+   },
+   "sideEffects": false,
+   "packageManager": "yarn@4.4.1"
+-}
++}
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index ae8d7a5e..810bdaf5 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -14,28 +14,29 @@ jobs:
+     strategy:
+       matrix:
+         node-version: [18.x, 20.x]
++      fail-fast: true
+ 
+     steps:
+       - name: Checkout repository
+         uses: actions/checkout@v4
+ 
+-      - name: Set up Node.js ${{ matrix.node-version }}
++      - name: Setup Node.js ${{ matrix.node-version }}
+         uses: actions/setup-node@v4
+         with:
+           node-version: ${{ matrix.node-version }}
+           cache: 'yarn'
+ 
+       - name: Install dependencies
+-        run: yarn install --frozen-lockfile
++        run: yarn install
+ 
+       - name: Check format
+         run: yarn format:check
+ 
+-      - name: Run lint
++      - name: Lint
+         run: yarn lint
+ 
+-      - name: Run tests
++      - name: Test
+         run: yarn test
+ 
+-      - name: Build project
++      - name: Build
+         run: yarn build

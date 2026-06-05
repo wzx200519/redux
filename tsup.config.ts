@@ -59,6 +59,10 @@ export default defineConfig((options): Options[] => {
     // Standard ESM, embedded `process.env.NODE_ENV` checks
     {
       ...commonOptions,
+      entry: {
+        redux: 'src/index.ts',
+        immutable: 'src/immutable.ts'
+      },
       format: ['esm'],
       outExtension: () => ({ js: '.mjs' }), // Add dts: '.d.ts' when egoist/tsup#1053 lands
       dts: true,
@@ -77,7 +81,8 @@ export default defineConfig((options): Options[] => {
     {
       ...commonOptions,
       entry: {
-        'redux.browser': 'src/index.ts'
+        'redux.browser': 'src/index.ts',
+        'immutable.browser': 'src/immutable.ts'
       },
       define: {
         'process.env.NODE_ENV': JSON.stringify('production')
@@ -88,6 +93,10 @@ export default defineConfig((options): Options[] => {
     },
     {
       ...commonOptions,
+      entry: {
+        redux: 'src/index.ts',
+        immutable: 'src/immutable.ts'
+      },
       format: ['cjs'],
       outDir: './dist/cjs/',
       outExtension: () => ({ js: '.cjs' })

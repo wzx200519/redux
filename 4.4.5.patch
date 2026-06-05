@@ -1,0 +1,52 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..7e572e44 100644
+--- a/package.json
++++ b/package.json
+@@ -32,6 +32,11 @@
+       "types": "./dist/redux.d.mts",
+       "import": "./dist/redux.mjs",
+       "default": "./dist/cjs/redux.cjs"
++    },
++    "./immutable": {
++      "types": "./dist/immutable.d.mts",
++      "import": "./dist/immutable.mjs",
++      "default": "./dist/cjs/immutable.cjs"
+     }
+   },
+   "files": [
+diff --git a/tsup.config.ts b/tsup.config.ts
+index d5824f3b..9cea6048 100644
+--- a/tsup.config.ts
++++ b/tsup.config.ts
+@@ -59,6 +59,10 @@ export default defineConfig((options): Options[] => {
+     // Standard ESM, embedded `process.env.NODE_ENV` checks
+     {
+       ...commonOptions,
++      entry: {
++        redux: 'src/index.ts',
++        immutable: 'src/immutable.ts'
++      },
+       format: ['esm'],
+       outExtension: () => ({ js: '.mjs' }), // Add dts: '.d.ts' when egoist/tsup#1053 lands
+       dts: true,
+@@ -77,7 +81,8 @@ export default defineConfig((options): Options[] => {
+     {
+       ...commonOptions,
+       entry: {
+-        'redux.browser': 'src/index.ts'
++        'redux.browser': 'src/index.ts',
++        'immutable.browser': 'src/immutable.ts'
+       },
+       define: {
+         'process.env.NODE_ENV': JSON.stringify('production')
+@@ -88,6 +93,10 @@ export default defineConfig((options): Options[] => {
+     },
+     {
+       ...commonOptions,
++      entry: {
++        redux: 'src/index.ts',
++        immutable: 'src/immutable.ts'
++      },
+       format: ['cjs'],
+       outDir: './dist/cjs/',
+       outExtension: () => ({ js: '.cjs' })

@@ -1,0 +1,16 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..7e572e44 100644
+--- a/package.json
++++ b/package.json
+@@ -32,6 +32,11 @@
+       "types": "./dist/redux.d.mts",
+       "import": "./dist/redux.mjs",
+       "default": "./dist/cjs/redux.cjs"
++    },
++    "./immutable": {
++      "types": "./dist/immutable.d.mts",
++      "import": "./dist/immutable.mjs",
++      "default": "./dist/cjs/immutable.cjs"
+     }
+   },
+   "files": [

@@ -1,0 +1,34 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..122f6b4b 100644
+--- a/package.json
++++ b/package.json
+@@ -25,19 +25,16 @@
+   ],
+   "main": "dist/cjs/redux.cjs",
+   "module": "dist/redux.legacy-esm.js",
+-  "types": "dist/redux.d.mts",
++  "types": "dist/redux.d.ts",
+   "exports": {
+     "./package.json": "./package.json",
+     ".": {
+-      "types": "./dist/redux.d.mts",
++      "types": "./dist/redux.d.ts",
+       "import": "./dist/redux.mjs",
++      "require": "./dist/cjs/redux.cjs",
+       "default": "./dist/cjs/redux.cjs"
+     }
+   },
+-  "files": [
+-    "dist",
+-    "src"
+-  ],
+   "scripts": {
+     "clean": "rimraf dist",
+     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+@@ -84,4 +81,4 @@
+   },
+   "sideEffects": false,
+   "packageManager": "yarn@4.4.1"
+-}
++}
+\ No newline at end of file

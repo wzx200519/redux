@@ -25,19 +25,16 @@
   ],
   "main": "dist/cjs/redux.cjs",
   "module": "dist/redux.legacy-esm.js",
-  "types": "dist/redux.d.mts",
+  "types": "dist/redux.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./dist/redux.d.mts",
+      "types": "./dist/redux.d.ts",
       "import": "./dist/redux.mjs",
+      "require": "./dist/cjs/redux.cjs",
       "default": "./dist/cjs/redux.cjs"
     }
   },
-  "files": [
-    "dist",
-    "src"
-  ],
   "scripts": {
     "clean": "rimraf dist",
     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",

@@ -32,6 +32,11 @@
       "types": "./dist/redux.d.mts",
       "import": "./dist/redux.mjs",
       "default": "./dist/cjs/redux.cjs"
+    },
+    "./immutable": {
+      "types": "./dist/immutable.d.mts",
+      "import": "./dist/immutable.mjs",
+      "default": "./dist/cjs/immutable.cjs"
     }
   },
   "files": [

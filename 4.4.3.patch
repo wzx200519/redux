@@ -1,0 +1,30 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..7e572e44 100644
+--- a/package.json
++++ b/package.json
+@@ -32,6 +32,11 @@
+       "types": "./dist/redux.d.mts",
+       "import": "./dist/redux.mjs",
+       "default": "./dist/cjs/redux.cjs"
++    },
++    "./immutable": {
++      "types": "./dist/immutable.d.mts",
++      "import": "./dist/immutable.mjs",
++      "default": "./dist/cjs/immutable.cjs"
+     }
+   },
+   "files": [
+diff --git a/tsup.config.ts b/tsup.config.ts
+index d5824f3b..209a3300 100644
+--- a/tsup.config.ts
++++ b/tsup.config.ts
+@@ -47,7 +47,8 @@ const mangleErrorsTransform: Plugin = {
+ export default defineConfig((options): Options[] => {
+   const commonOptions: Options = {
+     entry: {
+-      redux: 'src/index.ts'
++      redux: 'src/index.ts',
++      immutable: 'src/immutable.ts'
+     },
+     esbuildPlugins: [mangleErrorsTransform],
+     sourcemap: true,

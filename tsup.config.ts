@@ -47,7 +47,8 @@ const mangleErrorsTransform: Plugin = {
 export default defineConfig((options): Options[] => {
   const commonOptions: Options = {
     entry: {
-      redux: 'src/index.ts'
+      redux: 'src/index.ts',
+      immutable: 'src/immutable.ts'
     },
     esbuildPlugins: [mangleErrorsTransform],
     sourcemap: true,

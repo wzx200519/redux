@@ -1,0 +1,68 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 2d8d0209..dadb9757 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -2,11 +2,9 @@ name: CI
+ 
+ on:
+   push:
+-    branches:
+-      - main
++    branches: [main]
+   pull_request:
+-    branches:
+-      - main
++    branches: [main]
+ 
+ jobs:
+   build:
+@@ -16,26 +14,40 @@ jobs:
+         node-version: [18.x, 20.x]
+ 
+     steps:
+-      - name: Checkout code
+-        uses: actions/checkout@v4
++      - uses: actions/checkout@v4
+ 
+-      - name: Set up Node.js ${{ matrix.node-version }}
++      - name: Use Node.js ${{ matrix.node-version }}
+         uses: actions/setup-node@v4
+         with:
+           node-version: ${{ matrix.node-version }}
+-          cache: 'yarn'
++
++      - name: Enable corepack
++        run: corepack enable
++
++      - name: Get yarn cache directory path
++        id: yarn-cache-dir-path
++        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
++
++      - name: Cache yarn dependencies
++        uses: actions/cache@v4
++        id: yarn-cache
++        with:
++          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
++          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
++          restore-keys: |
++            ${{ runner.os }}-yarn-
+ 
+       - name: Install dependencies
+-        run: yarn install --frozen-lockfile
++        run: yarn install
+ 
+-      - name: Check format
++      - name: Format check
+         run: yarn format:check
+ 
+-      - name: Lint code
++      - name: Lint
+         run: yarn lint
+ 
+-      - name: Run tests
++      - name: Test
+         run: yarn test
+ 
+-      - name: Build project
++      - name: Build
+         run: yarn build

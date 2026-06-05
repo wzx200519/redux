@@ -1,0 +1,26 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..dcc985ac 100644
+--- a/package.json
++++ b/package.json
+@@ -25,12 +25,18 @@
+   ],
+   "main": "dist/cjs/redux.cjs",
+   "module": "dist/redux.legacy-esm.js",
+-  "types": "dist/redux.d.mts",
++  "types": "dist/redux.d.ts",
+   "exports": {
+     "./package.json": "./package.json",
+     ".": {
+-      "types": "./dist/redux.d.mts",
+-      "import": "./dist/redux.mjs",
++      "import": {
++        "types": "./dist/redux.legacy-esm.d.ts",
++        "default": "./dist/redux.mjs"
++      },
++      "require": {
++        "types": "./dist/redux.d.ts",
++        "default": "./dist/cjs/redux.cjs"
++      },
+       "default": "./dist/cjs/redux.cjs"
+     }
+   },

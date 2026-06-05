@@ -26,30 +26,40 @@
   "main": "dist/cjs/redux.cjs",
   "module": "dist/redux.legacy-esm.js",
   "types": "dist/redux.d.mts",
+  "typesVersions": {
+    "<4.7": {
+      "*": [
+        "dist/redux.d.ts"
+      ]
+    }
+  },
   "exports": {
     "./package.json": "./package.json",
     ".": {
       "types": "./dist/redux.d.mts",
+      "module": "./dist/redux.legacy-esm.js",
       "import": "./dist/redux.mjs",
+      "require": "./dist/cjs/redux.cjs",
       "default": "./dist/cjs/redux.cjs"
     }
   },
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "scripts": {
     "clean": "rimraf dist",
     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
     "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
     "lint": "eslint --ext js,ts src test",
-    "test": "vitest --run --typecheck",
-    "type-tests": "tsc -p tsconfig.test.json --noEmit",
-    "test:watch": "vitest --watch",
-    "test:cov": "vitest --coverage",
-    "build": "yarn clean && tsup",
-    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn test",
-    "prepack": "yarn build",
+    "check": "yarn format:check && yarn lint && yarn type-tests && yarn test",
+    "test": "cross-env NODE_ENV=test vitest --run --typecheck",
+    "type-tests": "cross-env NODE_ENV=test tsc -p tsconfig.test.json --noEmit",
+    "test:watch": "cross-env NODE_ENV=test vitest --watch",
+    "test:cov": "cross-env NODE_ENV=test vitest --coverage",
+    "build": "yarn clean && cross-env NODE_ENV=production tsup",
+    "postbuild": "node -e \"require('node:fs').copyFileSync('dist/redux.d.mts','dist/redux.d.ts')\"",
+    "prepublishOnly": "yarn check",
+    "prepack": "yarn check && yarn build",
     "examples:lint": "eslint --ext js,ts examples",
     "tsc": "tsc"
   },

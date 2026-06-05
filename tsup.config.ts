@@ -47,7 +47,8 @@ const mangleErrorsTransform: Plugin = {
 export default defineConfig((options): Options[] => {
   const commonOptions: Options = {
     entry: {
-      redux: 'src/index.ts'
+      redux: 'src/index.ts',
+      immutable: 'src/immutable.ts'
     },
     esbuildPlugins: [mangleErrorsTransform],
     sourcemap: true,
@@ -60,7 +61,7 @@ export default defineConfig((options): Options[] => {
     {
       ...commonOptions,
       format: ['esm'],
-      outExtension: () => ({ js: '.mjs' }), // Add dts: '.d.ts' when egoist/tsup#1053 lands
+      outExtension: () => ({ js: '.mjs' }),
       dts: true,
       clean: true
     },

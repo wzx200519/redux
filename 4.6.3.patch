@@ -1,0 +1,50 @@
+diff --git a/package.json b/package.json
+index 4a99f03e..4b255cef 100644
+--- a/package.json
++++ b/package.json
+@@ -26,30 +26,38 @@
+   "main": "dist/cjs/redux.cjs",
+   "module": "dist/redux.legacy-esm.js",
+   "types": "dist/redux.d.mts",
++  "typesVersions": {
++    "*": {
++      "*": [
++        "dist/redux.d.mts"
++      ]
++    }
++  },
+   "exports": {
+     "./package.json": "./package.json",
+     ".": {
+       "types": "./dist/redux.d.mts",
++      "module": "./dist/redux.legacy-esm.js",
+       "import": "./dist/redux.mjs",
++      "require": "./dist/cjs/redux.cjs",
+       "default": "./dist/cjs/redux.cjs"
+     }
+   },
+   "files": [
+-    "dist",
+-    "src"
++    "dist"
+   ],
+   "scripts": {
+     "clean": "rimraf dist",
+     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+     "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+     "lint": "eslint --ext js,ts src test",
+-    "test": "vitest --run --typecheck",
++    "test": "cross-env NODE_ENV=test vitest --run --typecheck",
+     "type-tests": "tsc -p tsconfig.test.json --noEmit",
+-    "test:watch": "vitest --watch",
+-    "test:cov": "vitest --coverage",
+-    "build": "yarn clean && tsup",
++    "test:watch": "cross-env NODE_ENV=test vitest --watch",
++    "test:cov": "cross-env NODE_ENV=test vitest --coverage",
++    "build": "yarn clean && cross-env NODE_ENV=production tsup",
+     "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn test",
+-    "prepack": "yarn build",
++    "prepack": "yarn format:check && yarn lint && yarn test && yarn build",
+     "examples:lint": "eslint --ext js,ts examples",
+     "tsc": "tsc"
+   },

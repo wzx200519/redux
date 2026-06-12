@@ -1,20 +1,25 @@
-diff --git a/package.json b/package.json
-index 4a99f03e..93553a1a 100644
---- a/package.json
-+++ b/package.json
-@@ -43,12 +43,13 @@
-     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
-     "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
-     "lint": "eslint --ext js,ts src test",
--    "test": "vitest --run --typecheck",
-+    "test": "vitest --run",
-+    "typecheck": "tsc --noEmit",
-     "type-tests": "tsc -p tsconfig.test.json --noEmit",
-     "test:watch": "vitest --watch",
-     "test:cov": "vitest --coverage",
-     "build": "yarn clean && tsup",
--    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn test",
-+    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn typecheck && yarn test",
-     "prepack": "yarn build",
-     "examples:lint": "eslint --ext js,ts examples",
-     "tsc": "tsc"
+diff --git a/4.5.1.patch b/4.5.1.patch
+index 1e59593d..e69de29b 100644
+--- a/4.5.1.patch
++++ b/4.5.1.patch
+@@ -1,20 +0,0 @@
+-diff --git a/package.json b/package.json
+-index 4a99f03e..93553a1a 100644
+---- a/package.json
+-+++ b/package.json
+-@@ -43,12 +43,13 @@
+-     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+-     "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+-     "lint": "eslint --ext js,ts src test",
+--    "test": "vitest --run --typecheck",
+-+    "test": "vitest --run",
+-+    "typecheck": "tsc --noEmit",
+-     "type-tests": "tsc -p tsconfig.test.json --noEmit",
+-     "test:watch": "vitest --watch",
+-     "test:cov": "vitest --coverage",
+-     "build": "yarn clean && tsup",
+--    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn test",
+-+    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn typecheck && yarn test",
+-     "prepack": "yarn build",
+-     "examples:lint": "eslint --ext js,ts examples",
+-     "tsc": "tsc"

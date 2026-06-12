@@ -1,19 +1,73 @@
-diff --git a/package.json b/package.json
---- a/package.json
-+++ b/package.json
-@@ -43,12 +43,13 @@
-     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
-     "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
-     "lint": "eslint --ext js,ts src test",
--    "test": "vitest --run --typecheck",
-+    "typecheck": "tsc --noEmit",
-+    "test": "vitest --run",
-     "type-tests": "tsc -p tsconfig.test.json --noEmit",
-     "test:watch": "vitest --watch",
-     "test:cov": "vitest --coverage",
-     "build": "yarn clean && tsup",
--    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn test",
-+    "prepublishOnly": "yarn clean && yarn format:check && yarn lint && yarn typecheck && yarn test",
-     "prepack": "yarn build",
-     "examples:lint": "eslint --ext js,ts examples",
-     "tsc": "tsc"
+import { describe, it, expect, expectTypeOf } from 'vitest';
+import { combineReducers, type Reducer, type Action } from 'redux';
+
+describe('combineReducers', () => {
+  it('1. 传入合法的 reducers 对象，应正常返回合并后的 reducer 函数，且类型推断正确', () => {
+    interface State {
+      counter: number;
+    }
+    
+    // 定义一个合法的 reducer
+    const counterReducer: Reducer<number, Action> = (state = 0, action) => {
+      if (action.type === 'INCREMENT') return state + 1;
+      return state;
+    };
+
+    const rootReducer = combineReducers({ counter: counterReducer });
+
+    // 验证运行时行为：正常返回一个 reducer 函数
+    expect(typeof rootReducer).toBe('function');
+    
+    const initialState = rootReducer(undefined, { type: '@@INIT' });
+    expect(initialState).toEqual({ counter: 0 });
+
+    // 验证 TypeScript 类型推断：不为 any，且 State 推断完全符合预期
+    expectTypeOf(rootReducer).toBeCallableWith(undefined, { type: '@@INIT' });
+    expectTypeOf(initialState).toEqualTypeOf<State>();
+  });
+
+  it('2. 传入的 reducers 中包含非函数的属性，应抛出清晰的错误信息，并且错误类型具备明确的区分', () => {
+    const invalidReducers = {
+      counter: ((state = 0) => state) as Reducer,
+      invalidNull: null as any,
+      invalidString: 'not a function' as any,
+    };
+
+    // 验证运行时抛出包含明确信息的错误
+    expect(() => combineReducers(invalidReducers)).toThrowError(/not a function|invalid|reducer/i);
+
+    try {
+      combineReducers(invalidReducers);
+    } catch (error: any) {
+      // 验证错误类型与修复前相比有明确的区分
+      // 例如：抛出的是自定义错误类，或带有特定的错误码，而不是原生普通的 TypeError
+      expect(error).toBeInstanceOf(Error);
+      const isCustomError = error.name !== 'TypeError' || error.code !== undefined;
+      expect(isCustomError).toBe(true);
+    }
+
+    // 验证类型推断：传入非法 reducers 时，返回的 TS 类型应为特定的错误类型或 never，而不再是 any
+    // 使用 @ts-expect-error 预期 TypeScript 会在此处提示类型报错
+    // @ts-expect-error
+    const invalidRootReducer = combineReducers(invalidReducers);
+    
+    // 确保修复后，即使类型绕过，其推断结果也不再是泛滥的 any
+    expectTypeOf(invalidRootReducer).not.toBeAny();
+  });
+
+  it('3. 传入空对象 {}，应返回一个 reducer 函数，该函数返回初始状态为 {}，并且对任何 action 不产生变化', () => {
+    const rootReducer = combineReducers({});
+
+    // 验证返回的是一个 reducer 函数
+    expect(typeof rootReducer).toBe('function');
+
+    // 验证初始状态为 {}
+    const initialState = rootReducer(undefined, { type: '@@INIT' });
+    expect(initialState).toEqual({});
+
+    // 验证对任何 action 不产生变化（引用保持完全一致）
+    const nextState = rootReducer(initialState, { type: 'SOME_RANDOM_ACTION' });
+    expect(nextState).toBe(initialState); // 引用相等
+    expect(nextState).toEqual({});
+  });
+});

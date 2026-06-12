@@ -1,0 +1,174 @@
+import { describe, it, expect } from 'vitest'
+import type { Action, Reducer } from 'redux'
+import { combineReducers } from 'redux'
+
+// ============================================================
+// 针对 "combineReducer 修复给定参数时返回错误类型的问题" 的测试
+// 覆盖三种场景：
+//   1. 传入合法的 reducers 对象 → 类型推断正确
+//   2. 传入包含非函数属性的 reducers → 返回类型为 never（而非 any）
+//   3. 传入空对象 {} → 返回合法的 Reducer<{}>
+// ============================================================
+
+describe('combineReducers — return type fix for invalid parameters', () => {
+
+  // ── 场景 1：合法 reducers → 正常返回合并后的 reducer，类型推断正确 ──
+  describe('valid reducers map', () => {
+    it('returns a composite reducer with correct runtime behavior', () => {
+      const reducer = combineReducers({
+        counter: (state: number = 0, action: { type: 'increment' }) =>
+          action.type === 'increment' ? state + 1 : state,
+        message: (
+          state: string = '',
+          action: { type: 'setMessage'; payload: string }
+        ) => (action.type === 'setMessage' ? action.payload : state),
+      })
+
+      const s1 = reducer(undefined, { type: 'increment' })
+      expect(s1).toEqual({ counter: 1, message: '' })
+
+      const s2 = reducer(s1, { type: 'setMessage', payload: 'hello' })
+      expect(s2).toEqual({ counter: 1, message: 'hello' })
+    })
+
+    it('return type is assignable to Reducer with correct state shape', () => {
+      const reducer = combineReducers({
+        counter: (state: number = 0) => state,
+        message: (state: string = '') => state,
+      })
+
+      // 类型级断言：返回类型必须是 Reducer<{ counter: number; message: string }>
+      const _typeAssert: Reducer<{ counter: number; message: string }> =
+        reducer
+      expect(_typeAssert).toBeDefined()
+    })
+
+    it('inferred state type excludes non-existent keys', () => {
+      const reducer = combineReducers({
+        count: (state: number = 0) => state,
+        flag: (state: boolean = false) => state,
+      })
+
+      const state = reducer(undefined, { type: '@@INIT' })
+
+      // 运行时验证
+      expect(state).toEqual({ count: 0, flag: false })
+      expect(Object.keys(state)).toEqual(['count', 'flag'])
+
+      // 类型级断言：确保 state 类型中不包含多余的 key
+      const _typeAssert: Reducer<{ count: number; flag: boolean }> = reducer
+      expect(_typeAssert).toBeDefined()
+    })
+  })
+
+  // ── 场景 2：包含非函数属性 → 返回类型为 never（而非 any） ──
+  describe('reducers containing non-function values', () => {
+    it('returns never type when a reducer value is null', () => {
+      // 核心修复验证：当 reducers 中包含 null 时，返回类型应为 never
+      // 修复前此处的返回类型为 any，TypeScript 不会报错
+      expectTypeOf(
+        combineReducers({
+          valid: (state = 0) => state,
+          // @ts-expect-error — null 不是合法的 Reducer，TypeScript 应在编译期报错
+          invalid: null,
+        })
+      ).toEqualTypeOf<never>()
+    })
+
+    it('returns never type when a reducer value is a string', () => {
+      expectTypeOf(
+        combineReducers({
+          valid: (state = 0) => state,
+          // @ts-expect-error — 字符串不是合法的 Reducer
+          broken: 'not a reducer',
+        })
+      ).toEqualTypeOf<never>()
+    })
+
+    it('returns never type when a reducer value is a number', () => {
+      expectTypeOf(
+        combineReducers({
+          valid: (state = 0) => state,
+          // @ts-expect-error — 数字不是合法的 Reducer
+          invalid: 42,
+        })
+      ).toEqualTypeOf<never>()
+    })
+
+    it('returns never type when a reducer value is an object (non-function)', () => {
+      expectTypeOf(
+        combineReducers({
+          valid: (state = 0) => state,
+          // @ts-expect-error — 普通对象不是合法的 Reducer
+          nested: { foo: 'bar' },
+        })
+      ).toEqualTypeOf<never>()
+    })
+
+    it('returns never type when ALL values are non-reducers', () => {
+      expectTypeOf(
+        combineReducers({
+          // @ts-expect-error
+          a: 'not a reducer',
+          // @ts-expect-error
+          b: 123,
+        })
+      ).toEqualTypeOf<never>()
+    })
+
+    it('at runtime, non-function properties are filtered out and only valid reducers run', () => {
+      // 运行时行为：非法属性被过滤，合法 reducer 正常工作
+      const reducer = combineReducers({
+        counter: (state: number = 0) => state,
+        fake: 'not a reducer' as unknown as Reducer,
+        another: null as unknown as Reducer,
+        nested: { x: 1 } as unknown as Reducer,
+      })
+
+      const state = reducer(undefined, { type: '@@INIT' })
+      expect(Object.keys(state)).toEqual(['counter'])
+      expect(state).toEqual({ counter: 0 })
+    })
+  })
+
+  // ── 场景 3：空对象 {} → 返回合法的 Reducer<{}> ──
+  describe('empty reducers object', () => {
+    it('returns a callable reducer function', () => {
+      const reducer = combineReducers({})
+      expect(typeof reducer).toBe('function')
+    })
+
+    it('initial state is an empty object', () => {
+      const reducer = combineReducers({})
+      const state = reducer(undefined, { type: '@@INIT' })
+      expect(state).toEqual({})
+    })
+
+    it('returns the same state reference for any action (no children to change)', () => {
+      const reducer = combineReducers({})
+      const initialState = reducer(undefined, { type: '@@INIT' })
+
+      const nextState = reducer(initialState, { type: 'ANY_ACTION' })
+      expect(nextState).toBe(initialState) // 引用相等
+
+      const anotherState = reducer(initialState, {
+        type: 'SOME_OTHER_ACTION',
+        payload: 123,
+      })
+      expect(anotherState).toBe(initialState) // 引用相等
+    })
+
+    it('return type is a valid Reducer with {} state shape', () => {
+      const reducer = combineReducers({})
+
+      // 类型级断言：空 reducers 应返回 Reducer<{}>
+      const _typeAssert: Reducer<{}> = reducer
+      expect(_typeAssert).toBeDefined()
+    })
+
+    it('return type is never when empty object is not the only thing', () => {
+      // 确认空对象与 never 类型的区别：纯 {} 合法，但一旦混入非法值则返回 never
+      expectTypeOf(combineReducers({})).not.toEqualTypeOf<never>()
+    })
+  })
+})

@@ -31,6 +31,10 @@
     ".": {
       "types": "./dist/redux.d.ts",
       "import": "./dist/redux.mjs",
+      "require": {
+        "types": "./dist/redux.d.ts",
+        "default": "./dist/cjs/redux.cjs"
+      },
       "default": "./dist/cjs/redux.cjs"
     }
   },
